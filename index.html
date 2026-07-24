@@ -1009,8 +1009,34 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:.1px}
 
   <!-- DOCUMENTS -->
   <section id="documents" class="page">
-    <div class="section-title"><div><h2>Documents &amp; Evidence</h2><p>Every document linked to an asset, event, tax classification, and source.</p></div><button class="btn primary" onclick="alert('Prototype: upload opens here.')">Upload</button></div>
-    <div class="card"><table class="table"><thead><tr><th>Document</th><th>Linked record</th><th>Source</th><th>Status</th></tr></thead><tbody id="docTable"></tbody></table></div>
+    <div class="section-title"><div><h2>Documents &amp; Evidence</h2><p>Every document linked to an asset, event, tax classification, and source. Paper, PDF, photo — all searchable.</p></div>
+      <button class="btn primary" onclick="openModal('uploadModal')">+ Upload document</button>
+    </div>
+    <!-- upload methods -->
+    <div class="grid cols-3" style="margin-bottom:18px">
+      <div class="card" style="text-align:center;cursor:pointer;border:2px dashed var(--line)" onclick="openModal('uploadModal')">
+        <div style="font-size:32px;margin-bottom:10px">📸</div>
+        <h3 style="font-size:15px">Photograph paper</h3>
+        <p>Point your phone camera at any warranty card, receipt, or appliance manual. OrdeNoi extracts the key data automatically.</p>
+        <span class="badge green" style="margin-top:10px">Phone camera</span>
+      </div>
+      <div class="card" style="text-align:center;cursor:pointer;border:2px dashed var(--line)" onclick="openModal('uploadModal')">
+        <div style="font-size:32px;margin-bottom:10px">📄</div>
+        <h3 style="font-size:15px">Upload PDF or file</h3>
+        <p>Drag in a PDF, Word doc, or image. Multi-page manuals, brochures, permits, and inspection reports all accepted.</p>
+        <span class="badge blue" style="margin-top:10px">Any file type</span>
+      </div>
+      <div class="card" style="text-align:center;cursor:pointer;border:2px dashed var(--line)" onclick="openModal('uploadModal')">
+        <div style="font-size:32px;margin-bottom:10px">🔍</div>
+        <h3 style="font-size:15px">OrdeNoi extracts</h3>
+        <p>Model number, serial number, warranty period, install date, and manufacturer contact — pulled automatically so you never type them.</p>
+        <span class="badge gold" style="margin-top:10px">AI-powered OCR</span>
+      </div>
+    </div>
+    <div class="notice" style="margin-bottom:18px">
+      <b>Every document is linked — not just stored.</b> A warranty card connects to the system it covers, the installation date, the contractor, the tax classification, and the certification dimension it supports. When you sell, the buyer inherits the intelligence — not just a folder of files.
+    </div>
+    <div class="card"><table class="table"><thead><tr><th>Document</th><th>Linked record</th><th>Extracted data</th><th>Source</th><th>Status</th></tr></thead><tbody id="docTable"></tbody></table></div>
   </section>
 
   <!-- RELATIONSHIPS -->
@@ -1472,7 +1498,47 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:.1px}
 </div><!-- end realtor-app -->
 
 <!-- modals -->
-<div class="modal" id="eventModal">
+<div class="modal" id="uploadModal">
+  <div class="modal-card" style="max-width:580px">
+    <h3 style="margin-bottom:6px">Upload a document</h3>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:20px">Paper, PDF, photo, or file. OrdeNoi links it to the right record and extracts key data automatically.</p>
+    <!-- upload zone -->
+    <div id="uploadZone" style="border:2px dashed var(--line);border-radius:14px;padding:32px;text-align:center;background:#FAF8F2;margin-bottom:18px;transition:background .2s;cursor:pointer" onclick="simulateUpload()" ondragover="event.preventDefault();this.style.background='#F0EAD8'" ondragleave="this.style.background='#FAF8F2'">
+      <div style="font-size:40px;margin-bottom:10px">📎</div>
+      <p style="font-weight:700;color:var(--navy);margin-bottom:4px">Drop file here or tap to upload</p>
+      <p style="color:var(--muted);font-size:13px">PDF · JPEG · PNG · HEIC · Word · up to 50MB</p>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <span class="badge blue">📸 Camera scan</span>
+        <span class="badge blue">📄 PDF upload</span>
+        <span class="badge blue">🖼 Photo</span>
+      </div>
+    </div>
+    <!-- OCR processing simulation -->
+    <div id="ocrProcessing" style="display:none;background:var(--gold-wash);border:1px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:18px">
+      <p style="font-weight:700;color:var(--navy);margin-bottom:10px">🔍 OrdeNoi is reading your document…</p>
+      <div id="ocrSteps"></div>
+    </div>
+    <!-- OCR result -->
+    <div id="ocrResult" style="display:none;background:var(--green-bg);border:1px solid var(--green);border-radius:12px;padding:16px;margin-bottom:18px">
+      <p style="font-weight:700;color:var(--green);margin-bottom:12px">✓ Data extracted — confirm or edit before saving</p>
+      <div class="form-grid">
+        <div class="form-group"><label>Document type</label><select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:10px"><option>Warranty card</option><option>Receipt / invoice</option><option>Appliance manual</option><option>Permit</option><option>Insurance document</option><option>Contract</option><option>Other</option></select></div>
+        <div class="form-group"><label>Linked system / asset</label><select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:10px"><option>Water heater (Jan 2026)</option><option>HVAC system</option><option>Flooring</option><option>Electrical panel</option><option>Roof</option><option>Other</option></select></div>
+        <div class="form-group"><label>Extracted: Model number</label><input type="text" value="ProLine XE 40-Gallon" style="border:1px solid var(--green);border-radius:9px;padding:10px"/></div>
+        <div class="form-group"><label>Extracted: Serial number</label><input type="text" value="BW-2026-447821-X" style="border:1px solid var(--green);border-radius:9px;padding:10px"/></div>
+        <div class="form-group"><label>Extracted: Warranty period</label><input type="text" value="10 years — parts and labour" style="border:1px solid var(--green);border-radius:9px;padding:10px"/></div>
+        <div class="form-group"><label>Extracted: Manufacturer contact</label><input type="text" value="1-800-999-9TON · support.com" style="border:1px solid var(--green);border-radius:9px;padding:10px"/></div>
+        <div class="form-group"><label>Tax classification</label><select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:10px"><option>Capital improvement</option><option>Maintenance / repair</option><option>Operating expense</option><option>Not classified</option></select></div>
+        <div class="form-group"><label>Certification dimension</label><select style="width:100%;border:1px solid var(--line);border-radius:9px;padding:10px"><option>Systems &amp; maintenance</option><option>Records &amp; evidence</option><option>Financial &amp; tax</option><option>Risk &amp; insurance</option></select></div>
+      </div>
+      <div class="notice" style="margin-top:14px">This document will be linked to the water heater record, added to the tax workspace, and counted toward your Records &amp; evidence certification dimension.</div>
+    </div>
+    <div id="uploadActions" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn primary" id="uploadSaveBtn" style="display:none" onclick="saveDocument()">Save to ownership record</button>
+      <button class="btn light" onclick="closeModal('uploadModal');resetUpload()">Cancel</button>
+    </div>
+  </div>
+</div>
   <div class="modal-card">
     <h3 style="margin-bottom:16px">Add ownership event</h3>
     <div class="form-grid">
@@ -1874,7 +1940,7 @@ function switchProperty(id){
     <div class="em-block">${em.contacts.map(s=>`<div class="em-item"><span>${esc(s[0])}</span><b>${esc(s[1])}</b></div>`).join('')}<h4 class="safe" style="margin-top:8px">Emergency Contacts</h4></div>`);
   setHTML('maintenanceContent',x.maintenanceSchedule.map(ms=>`<div style="margin-bottom:16px"><h4 style="font-size:13.5px;color:var(--navy);margin-bottom:6px">${esc(ms[0])}</h4>${ms[1].map(t=>`<div class="priority"><span class="dot teal"></span><div><p>${esc(t)}</p></div></div>`).join('')}</div>`).join(''));
   // documents
-  setHTML('docTable',x.docs.map(d=>`<tr><td><b>${esc(d[0])}</b></td><td>${esc(d[1])}</td><td>${esc(d[2])}</td><td><span class="badge ${d[3]==='Verified'||d[3]==='Indexed'||d[3]==='Imported'||d[3]==='Documented'?'green':d[3]==='Linked'?'blue':'amber'}">${esc(d[3])}</span></td></tr>`).join(''));
+  setHTML('docTable',x.docs.map(d=>`<tr><td><b>${esc(d[0])}</b></td><td>${esc(d[1])}</td><td><span style="color:var(--muted);font-size:12px">${d[4]||'Model, serial, warranty extracted'}</span></td><td>${esc(d[2])}</td><td><span class="badge ${d[3]==='Verified'||d[3]==='Indexed'||d[3]==='Imported'||d[3]==='Documented'?'green':d[3]==='Linked'?'blue':'amber'}">${esc(d[3])}</span></td></tr>`).join(''));
   // relationships
   setText('graphSubtitle',`${x.name} · all advisors and service relationships`);
   setHTML('relationshipCards',x.relationships.map(r=>`<div class="card"><span class="badge ${r[2]==='Connected'||r[2]==='Active'?'green':r[2]==='Not assigned'||r[2]==='Needed'?'red':'amber'}">${esc(r[2])}</span><h3 style="margin-top:10px">${esc(r[0])}</h3><p>${esc(r[1])}</p></div>`).join(''));
@@ -2066,8 +2132,53 @@ function endTour(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   MODALS
+   DOCUMENT UPLOAD & OCR SIMULATION
 ════════════════════════════════════════════════════════════ */
+function simulateUpload(){
+  document.getElementById('uploadZone').style.display='none';
+  const proc=document.getElementById('ocrProcessing');
+  proc.style.display='block';
+  const steps=[
+    '📸 Reading document…',
+    '🔍 Detecting document type — warranty card identified',
+    '⚙️ Extracting model number, serial number, warranty period…',
+    '📋 Matching to water heater record (Jan 2026)…',
+    '💰 Classifying as capital improvement for tax workspace…',
+    '✓ Linking to Records & evidence certification dimension…'
+  ];
+  let i=0;
+  const el=document.getElementById('ocrSteps');
+  el.innerHTML='';
+  const interval=setInterval(()=>{
+    el.innerHTML+=`<p style="font-size:13px;color:var(--navy);margin:4px 0;opacity:0;animation:fadein .3s ease forwards">${esc(steps[i])}</p>`;
+    i++;
+    if(i>=steps.length){
+      clearInterval(interval);
+      setTimeout(()=>{
+        proc.style.display='none';
+        document.getElementById('ocrResult').style.display='block';
+        document.getElementById('uploadSaveBtn').style.display='inline-block';
+      },600);
+    }
+  },520);
+}
+function saveDocument(){
+  closeModal('uploadModal');
+  resetUpload();
+  // add to doc table
+  const x=properties[currentId];
+  x.docs.unshift(['Water heater warranty card','Water heater','Manufacturer — OCR extracted','Verified']);
+  setHTML('docTable',x.docs.map(d=>`<tr><td><b>${esc(d[0])}</b></td><td>${esc(d[1])}</td><td><span style="color:var(--muted);font-size:12px">${d[4]||'Model, serial, warranty extracted'}</span></td><td>${esc(d[2])}</td><td><span class="badge ${d[3]==='Verified'||d[3]==='Indexed'||d[3]==='Imported'||d[3]==='Documented'?'green':d[3]==='Linked'?'blue':'amber'}">${esc(d[3])}</span></td></tr>`).join(''));
+  goOwner('documents');
+  setTimeout(()=>alert('Warranty card saved. Linked to water heater record, tax workspace, and certification. Warranty action is now resolved.'),200);
+}
+function resetUpload(){
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('ocrProcessing').style.display='none';
+  document.getElementById('ocrResult').style.display='none';
+  document.getElementById('uploadSaveBtn').style.display='none';
+  document.getElementById('ocrSteps').innerHTML='';
+}
 function openModal(id){document.getElementById(id).classList.add('show')}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
